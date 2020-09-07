@@ -45,28 +45,28 @@ export class AuthService {
     }
   }
 
-  static async refreshTokens () {
-    try {
-      const response = await axios.post(`${API_URL}/auth/refresh-tokens`, {
-        fingerprint: await _getFingerprint()
-      }, { withCredentials: true })
+  // static async refreshTokens () {
+  //   try {
+  //     const response = await axios.post(`${API_URL}/auth/refresh-tokens`, {
+  //       fingerprint: await _getFingerprint()
+  //     }, { withCredentials: true })
 
-      _setAuthData({
-        accessToken: response.data.data.accessToken,
-        exp: _parseTokenData(response.data.data.accessToken).exp
-      })
-      return new ResponseWrapper(response, response.data.data)
-    } catch (error) {
-      console.log(error.response.data.code)
-      _resetAuthData()
-      $router.push({ name: 'login' }).catch(() => {})
-      throw new ErrorWrapper(error)
-    }
-  }
+  //     _setAuthData({
+  //       accessToken: response.data.data.accessToken,
+  //       exp: _parseTokenData(response.data.data.accessToken).exp
+  //     })
+  //     return new ResponseWrapper(response, response.data.data)
+  //   } catch (error) {
+  //     console.log(error.response.data.code)
+  //     _resetAuthData()
+  //     $router.push({ name: 'login' }).catch(() => {})
+  //     throw new ErrorWrapper(error)
+  //   }
+  // }
 
-  static debounceRefreshTokens = this._debounce(() => {
-    return this.refreshTokens()
-  }, 100)
+  // static debounceRefreshTokens = this._debounce(() => {
+  //   return this.refreshTokens()
+  // }, 100)
 
   /**
    ******************************

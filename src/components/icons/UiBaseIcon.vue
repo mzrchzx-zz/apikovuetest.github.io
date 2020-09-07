@@ -17,6 +17,8 @@ import arrowDown from './arrowDown'
 import sort from './sort'
 import sortDown from './sortDown'
 import sortUp from './sortUp'
+import heart from './heart'
+import heartWhite from './heart-white'
 
 export default {
   name: 'UiIconBase',
@@ -46,7 +48,9 @@ export default {
     arrowDown,
     sort,
     sortDown,
-    sortUp
+    sortUp,
+    heart,
+    heartWhite
   }
 }
 </script>

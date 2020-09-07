@@ -1,9 +1,9 @@
 <template>
   <div>
   <HeaderAuth></HeaderAuth>
-  <div class="login">
+  <div class="register">
     <div class="main">
-      <div class="header">Login</div>
+      <div class="header">Register</div>
       <form novalidate class="content" @submit.prevent="validateUser">
 
       <md-field :class="getValidationClass('email')">
@@ -13,6 +13,13 @@
         <span class="md-error" v-else-if="!$v.form.email.email">Invalid email</span>
       </md-field>
 
+      <md-field :class="getValidationClass('name')">
+        <label for="name">Name</label>
+        <md-input id="name" type="text" v-model="form.name" placeholder="Tony Stark" autocomplete="given-name" :disabled="sending"></md-input>
+        <span class="md-error" v-if="!$v.form.name.required">The first name is required</span>
+        <span class="md-error" v-else-if="!$v.form.name.minlength">Invalid first name</span>
+      </md-field>
+      
         <md-field :class="getValidationClass('password')">
           <label>Password</label>
           <md-input v-model.trim="form.password" type="password" :disabled="sending"></md-input>
@@ -20,25 +27,32 @@
           <span class="md-error" v-else-if="!$v.form.password.maxlength">Invalid password</span>
         </md-field>
 
+        <md-field :md-toggle-password="true" :class="getValidationClass('repeatPassword')">
+          <label>Password again</label>
+          <md-input v-model.trim="form.repeatPassword" type="password"  :disabled="sending"></md-input>
+           <span class="md-error" v-if="!$v.form.repeatPassword.sameAsPassword">Invalid password</span>
+        </md-field>
+
       <md-progress-bar md-mode="indeterminate" v-if="sending" />
 
       <div class="buttons">
-        <md-button v-bind:style="loginBtn" class="md-raised" @click="makeLogin" type="submit" :disabled="sending">
-              Continue
+        <md-button v-bind:style="registerBtn" class="md-raised" @click="makeRegister" type="submit" :disabled="sending">
+              Register
         </md-button>
       </div>
       </form>
       
+      <md-snackbar :md-active.sync="userSaved">The user {{ form.name }} was registered success!</md-snackbar>
 
       <div class="error" v-if="error">
         {{ error }}
       </div>
     </div>
-    <div class="register">
-      <span>I have no account,</span>
+    <div class="login">
+      <span>I already have an account,</span>
       <span>
-        <router-link :to="{ name: 'register' }">
-        REGISTER NOW
+        <router-link :to="{ name: 'login' }">
+        LOG IN
         </router-link>
         </span>
     </div>
@@ -58,22 +72,24 @@ import {
     sameAs
   } from 'vuelidate/lib/validators'
 
-
 export default {
-  name: 'Login',
+  name: 'Register',
   components: {
     HeaderAuth,
   },
   mixins: [validationMixin],
   data () {
     return {
+      userSaved: false,
       sending: false,
       error: '',
       form: {
         email: null,
         password: null,
+        repeatPassword: null,
+        name: null,
       },
-      loginBtn: {
+      registerBtn: {
         color: 'white',
         background:'#349A89',
         borderRadius: '4px',
@@ -105,23 +121,26 @@ validations: {
       }
     },
   methods: {
-    async makeLogin () {
+    async makeRegister () {
       this.sending = true
       this.error = '';
       try {
-        await this.$store.dispatch('login', {
+        await this.$store.dispatch('signup', {
           email: this.form.email,
-          password: this.form.password
-      })
+          password: this.form.password,
+          name: this.form.name
+        })
+        this.userSaved = true
+        this.clearForm();
 
       } catch (error) {
+        this.userSaved = false
         this.$store.commit('toast/NEW', { type: 'error', message: error.message })
-        this.error = error.status === 404 ? 'User with same email not found' : error.message
+        this.error = error.message
       }
-          window.setTimeout(() => {
+      window.setTimeout(() => {
            this.sending = false
         }, 1500)
-        // await this.$router.push('profile')
     },
     getValidationClass (fieldName) {
         const field = this.$v.form[fieldName]
@@ -132,11 +151,18 @@ validations: {
           }
         }
       },
+      clearForm () {
+        this.$v.$reset()
+        this.form.name = null
+        this.form.email = null
+        this.form.password = null
+        this.form.repeatPassword = null
+      },
       validateUser () {
         this.$v.$touch()
 
         if (!this.$v.$invalid) {
-          this.makeLogin()
+          this.makeRegister()
         }
       }
   }
@@ -144,18 +170,20 @@ validations: {
 </script>
 
 <style lang="scss" scoped>
-
   
-.login {
+.register {
   width: 100%;
   height: 70%;
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 40px;
+  margin-top: auto;
+  margin-bottom: auto;
   flex-direction: column;
+  position: relative;
 
-  .register {
+
+  .login {
     margin-top: 24px;
     padding: 30px 93px;
     text-align: center;
@@ -163,14 +191,14 @@ validations: {
     box-shadow: 0px 2px 42px rgba(0, 0, 0, 0.111233);
     border-radius: 7px;
   }
-
+  
   .main {
-    position: relative;
     padding: 30px 20px;
     background: #fff;
     width: 425px;
     border-radius: 7px;
     box-shadow: 0 11px 15px -7px rgba(208, 208, 208, 0.13), 0 24px 38px 3px rgba(0, 0, 0, 0.14), 0 9px 46px 8px rgba(255, 255, 255, 0.64);
+    position: relative;
 
     .md-progress-bar {
     position: absolute;
@@ -178,7 +206,17 @@ validations: {
     right: 0;
     left: 0;
   }
-    
+
+    .content {
+      padding-top: 25px;
+    }
+
+    .header {
+      font-family: Helvetica;
+      font-size: 22px;
+      line-height: 25px;
+      color: #282828;
+    }
 
     .md-field.md-theme-default label {
       color: #303030;

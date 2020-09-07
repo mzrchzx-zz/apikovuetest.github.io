@@ -1,21 +1,16 @@
-// https://cli.vuejs.org/guide/css.html#passing-options-to-pre-processor-loaders
 module.exports = {
-  css: {
-    loaderOptions: {
-      scss: {
-        prependData: `
-          @import "@/scss/_variables.scss";
-          @import "@/scss/_fonts.scss";
-          @import "@/scss/_medias.scss";
-          @import "@/scss/_mixins.scss";
-        `
+  "css": {
+    "loaderOptions": {
+      "scss": {
+        "prependData": "\n          @import \"@/scss/_variables.scss\";\n          @import \"@/scss/_fonts.scss\";\n          @import \"@/scss/_medias.scss\";\n          @import \"@/scss/_mixins.scss\";\n        "
       }
     }
   },
-
-  devServer: {
-    watchOptions: {
-      clientLogLevel: 'warning'
+  "devServer": {
+    "watchOptions": {
+      "clientLogLevel": "warning"
     }
-  }
+  },
+  "transpileDependencies": [
+  ]
 }

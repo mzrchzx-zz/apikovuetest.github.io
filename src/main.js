@@ -11,12 +11,19 @@ import './thirdParty'
 import './scss/style.scss'
 import './assets/fonts/bebasneue.css'
 
+import { auth } from './services/firebase'
+
 Vue.config.productionTip = false
 
+let app = null;
+
+auth.onAuthStateChanged(() => {
+  if (!app) {
 new Vue({
   name: 'Root',
   router,
   store,
+
   mounted () {
     store.commit('dom/SET_WINDOW_WIDTH', window.innerWidth)
     window.addEventListener('resize', () => store.commit('dom/SET_WINDOW_WIDTH', window.innerWidth))
@@ -25,5 +32,8 @@ new Vue({
   beforeDestroy () {
     window.removeEventListener('resize', () => store.commit('dom/SET_WINDOW_WIDTH', window.innerWidth))
   },
+
   render: h => h(AppLayout)
 }).$mount('#app')
+  }
+})

@@ -78,8 +78,7 @@ export default {
     align-items: center;
 
     li {
-      padding: 15px;
-
+      padding: 15px 0;
     }
 
     &.side {
